@@ -49,9 +49,9 @@ class GeminiClient:
     def naive_answer_over_full_docs(self, query, all_text):
         # We ignore all_text and send a generic prompt instead
         prompt = f"""
-    You are a documentation assistant. 
-    Answer this developer question: {query}
-    """
+            You are a documentation assistant. 
+            Answer this developer question: {query}
+        """
         response = self.model.generate_content(prompt)
         return (response.text or "").strip()
 
@@ -83,29 +83,29 @@ class GeminiClient:
         context = "\n\n".join(context_blocks)
 
         prompt = f"""
-You are a cautious documentation assistant helping developers understand a codebase.
+            You are a cautious documentation assistant helping developers understand a codebase.
 
-You will receive:
-- A developer question
-- A small set of snippets from project files
+            You will receive:
+            - A developer question
+            - A small set of snippets from project files
 
-Your job:
-- Answer the question using only the information in the snippets.
-- If the snippets do not provide enough evidence, refuse to guess.
+            Your job:
+            - Answer the question using only the information in the snippets.
+            - If the snippets do not provide enough evidence, refuse to guess.
 
-Snippets:
-{context}
+            Snippets:
+            {context}
 
-Developer question:
-{query}
+            Developer question:
+            {query}
 
-Rules:
-- Use only the information in the snippets. Do not invent new functions,
-  endpoints, or configuration values.
-- If the snippets are not enough to answer confidently, reply exactly:
-  "I do not know based on the docs I have."
-- When you do answer, briefly mention which files you relied on.
-"""
+            Rules:
+            - Use only the information in the snippets. Do not invent new functions,
+            endpoints, or configuration values.
+            - If the snippets are not enough to answer confidently, reply exactly:
+            "I do not know based on the docs I have."
+            - When you do answer, briefly mention which files you relied on.
+        """
 
         response = self.model.generate_content(prompt)
         return (response.text or "").strip()

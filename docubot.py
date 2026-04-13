@@ -41,7 +41,11 @@ class DocuBot:
                 with open(path, "r", encoding="utf8") as f:
                     text = f.read()
                 filename = os.path.basename(path)
-                docs.append((filename, text))
+                chunks = text.split("\n\n")
+                for chunk in chunks:
+                    chunk = chunk.strip()
+                    if chunk:
+                        docs.append((filename, chunk))
         return docs
 
     # -----------------------------------------------------------
@@ -64,7 +68,12 @@ class DocuBot:
         ignore punctuation if needed.
         """
         index = {}
-        # TODO: implement simple indexing
+        for filename, text in documents:
+            words = text.lower().split()
+            for word in words:
+                if word not in index:
+                    index[word] = set()  # set for O(1) lookup
+                index[word].add(filename)
         return index
 
     # -----------------------------------------------------------
@@ -81,8 +90,15 @@ class DocuBot:
         - Count how many appear in the text
         - Return the count as the score
         """
-        # TODO: implement scoring
-        return 0
+        stop_words = {"the", "a", "an", "is", "do", "how", "to", "i", "in", "of",
+                      "and", "for", "it", "on", "are", "was", "be", "this", "that", "with"}
+        query_words = set(query.lower().split()) - stop_words
+        text_words = set(text.lower().split()) - stop_words
+        score = 0
+        for word in query_words:
+            if word in text_words:
+                score += 1
+        return score
 
     def retrieve(self, query, top_k=3):
         """
@@ -91,8 +107,22 @@ class DocuBot:
 
         Return a list of (filename, text) sorted by score descending.
         """
+        # Use the index to find candidate docs that contain at least one query word
+        query_words = query.lower().split()
+        candidate_filenames = set()
+        for word in query_words:
+            if word in self.index:
+                candidate_filenames.update(self.index[word])
+
         results = []
-        # TODO: implement retrieval logic
+        for filename, text in self.documents:
+            if filename not in candidate_filenames:
+                continue
+            score = self.score_document(query, text)
+            if score > 0:
+                results.append((filename, text, score))
+        results.sort(key=lambda x: x[2], reverse=True)
+        results = [(filename, text) for filename, text, _ in results]
         return results[:top_k]
 
     # -----------------------------------------------------------

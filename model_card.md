@@ -15,7 +15,7 @@ Use clear, honest descriptions. It is fine if your system is imperfect.
 **What is DocuBot trying to do?**  
 Describe the overall goal in 2 to 3 sentences.
 
-> _Your answer here._
+> implementing a GPT powered chat function, a search function based on some similarity and a combination of two.
 
 **What inputs does DocuBot take?**  
 For example: user question, docs in folder, environment variables.
